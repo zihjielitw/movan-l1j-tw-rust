@@ -1,0 +1,20 @@
+[package]
+name = "movan-l1j-tw-rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.95"
+bytes = "1.9.0"
+encoding = "0.2.33"
+lazy_static = "1.5.0"
+rolling-file = "0.2.0"
+serde = { version = "1.0.217", features = ["derive"] }
+time = { version = "0.3.37", features = ["macros"] }
+tokio = { version = "1.42.0", features = ["full"] }
+tokio-graceful-shutdown = "0.15.2"
+toml = "0.8.19"
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["local-time"] }
+tracing-appender = "0.2.3"
+chrono = "0.4.39"

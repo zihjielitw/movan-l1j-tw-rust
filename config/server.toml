@@ -1,0 +1,14 @@
+#[system]
+# 系統顯示語系
+#locales = "zh-TW"
+
+[server]
+# 伺服器 IP 或網域名稱，可使用 * 來綁定所有 IP
+hostname="0.0.0.0"
+# 伺服器 PORT 設定 (預設值一般無須變更)
+port=8888
+
+#客戶端語言 0.US 3.Taiwan 4.Janpan 5.China
+client_language = 3
+
+[database]

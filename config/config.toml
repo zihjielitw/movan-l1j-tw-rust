@@ -1,0 +1,4 @@
+# 遊戲參數設定
+[game]
+#全體聊天最低等級限制
+global_chat_level=30
