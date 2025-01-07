@@ -11,13 +11,12 @@ static GLOBAL_SERVER_CONFIG: OnceCell<ServerConfig> = OnceCell::const_new();
 #[derive(Deserialize)]
 pub struct GameConfig {
     pub game: ConfigGameNode,
-    // pub database: String,
 }
 
 #[derive(Deserialize)]
 pub struct ServerConfig {
     pub server: ConfigServerNode,
-    // pub database: String,
+    pub database: ConfigDatabaseNode,
 }
 
 #[derive(Deserialize)]
@@ -27,9 +26,20 @@ pub struct ConfigGameNode {
 
 #[derive(Deserialize)]
 pub struct ConfigServerNode {
+    pub allow_multiple_pc: bool,
     pub client_language: i32,
     pub hostname: String,
     pub port: u16,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigDatabaseNode {
+    pub db_account: String,
+    pub db_host: String,
+    pub db_name: String,
+    pub db_password: String,
+    pub db_pool_max_connections: u32,
+    pub db_port: u16,
 }
 
 impl GameConfig {
@@ -47,7 +57,7 @@ impl GameConfig {
 
         let game_config = match fs::read_to_string("./config/config.toml") {
             Ok(c) => c,
-            Err(e) => {
+            Err(_) => {
                 eprintln!("Could not read config file ./config/config.toml");
                 exit(1);
             }

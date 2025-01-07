@@ -61,12 +61,33 @@ impl Cipher {
         }
     }
 
-    pub fn  encrypt(&mut self, data: &[u8]) -> Vec<u8> {
+    /**
+    * 將未受保護的資料進行混淆,避免資料外流.
+    *
+    * @param data, 未受保護的資料
+    * @return data, 受保護的資料
+    */
+    pub fn encrypt<'a>(&mut self, data: &'a mut [u8]) -> &'a [u8] {
+
         for i in 0..self.tb.len() {
             self.tb[i] = data[i];
         }
 
-        vec![0; 1]
+
+        data[0] ^= self.eb[0];
+
+        for i in 1..data.len() {
+            data[i] ^= data[i-1] ^ self.eb[i&7]
+        }
+
+        data[3] ^= self.eb[2];
+        data[2] ^= self.eb[3] ^ data[3];
+        data[1] ^= self.eb[4] ^ data[2];
+        data[0] ^= self.eb[5] ^ data[1];
+
+        self.update_eb();
+       
+        data
     }
 
     /**
@@ -75,21 +96,24 @@ impl Cipher {
      * @param data		加密資料
      * @return data		原始資料
      **/
-    pub fn decrypt(&mut self, data: &mut [u8]) -> Vec<u8> {
+    pub fn decrypt<'a>(&mut self, data: &'a mut [u8]) ->  &'a [u8] {
         data[0] ^= self.db[5] ^ data[1];
         data[1] ^= self.db[4] ^ data[2];
         data[2] ^= self.db[3] ^ data[3];
         data[3] ^= self.db[2];
+
+        println!("data: {:02X?}", &data);
+        println!("db: {:02X?}", &self.db);
+
 
         for i in (1..data.len()).rev() {
             data[i] ^= data[i-1] ^ self.db[i&7]
         }
 
         data[0] ^= self.db[0];
-
-        self.update_db(data);
-        println!("解密=========>: {:02X?}", &data[..]);
-        vec![0; 1]
+        println!("解密: {:02X?}", &data);
+        self.update_db(data.to_vec());
+        data
     }
 
     /**
@@ -97,15 +121,40 @@ impl Cipher {
     *
     * @param ref		原始資料
     */
-    pub fn update_db(&mut self, ref_data: &[u8]) {
+    pub fn update_db(&mut self, ref_data: Vec<u8>) {
+
+
         for i in 0..self.tb.len() {
             self.db[i] ^= ref_data[i]
         }
 
-        let v_i32 = (self.db[7]&0xFF).checked_shl(24).unwrap_or(0) as i32 | (self.db[6]&0xFF).checked_shl(16).unwrap_or(0) as i32 | (self.db[5]&0xFF).checked_shl(8).unwrap_or(0) as i32 | (self.db[4]&0xFF) as i32 + self._4;
+        let v_i32 = (i32::from(self.db[7]&0xFF) << 24 | i32::from(self.db[6]&0xFF) << 16 | i32::from(self.db[5]&0xFF) << 8 | i32::from(self.db[4]&0xFF)) + self._4;
+/*
+        println!("self.db[7]&0xFF) << 24: {}", i32::from(self.db[7] & 0xFF) << 24);
+        println!("self.db[6]&0xFF) << 16: {}", i32::from(self.db[6] & 0xFF) << 16);
+        println!("self.db[5]&0xFF) << 8: {}", i32::from(self.db[5] & 0xFF) << 8);
+        println!("self.db[4]&0xFF): {}", i32::from(self.db[4] & 0xFF) );
+        println!("_4: {}",  self._4);
+        println!("v_i32: {}", v_i32);*/
 
         for i in 0..self.tb.len() {
             self.db[i+4] = (v_i32 >> (i * 8) & 0xff) as u8;
+        }
+    }
+
+    /**
+    * 將指定的鑰匙進行混淆並與混淆鑰匙相加 (_4)
+    *
+    * @param ref		原始資料
+    */
+    pub fn update_eb(&mut self) {
+        for i in 0..self.tb.len() {
+            self.eb[i] ^= self.tb[i]
+        }
+
+        let v_i32 = (i32::from(self.eb[7]&0xFF) << 24 | i32::from(self.eb[6]&0xFF) << 16 | i32::from(self.eb[5]&0xFF) << 8 | i32::from(self.eb[4]&0xFF)) + self._4;
+        for i in 0..self.tb.len() {
+            self.eb[i+4] = (v_i32 >> (i * 8) & 0xff) as u8;
         }
     }
 }

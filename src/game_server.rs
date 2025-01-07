@@ -1,13 +1,14 @@
-mod client_connection;
+mod client_thread;
 mod cipher;
 mod client_base_packet;
 mod client_packets;
 mod server_base_packet;
 mod server_packets;
+mod services;
 
 use tracing::info;
 use crate::game_context::GameContext;
-use crate::game_server::client_connection::ClientConnection;
+use crate::game_server::client_thread::ClientThread;
 
 pub struct GameServer {
     pub host: String,
@@ -36,8 +37,8 @@ impl GameServer {
             println!("新客戶端連線 {}", addr);
 
             tokio::task::spawn(async move {
-                let mut client_connection = ClientConnection::new(socket);
-                client_connection.handle_packet().await;
+                let mut client_thread = ClientThread::new(socket);
+                client_thread.handle_packet().await;
             });
         }
     }

@@ -1,14 +1,20 @@
-#[system]
-# 系統顯示語系
-#locales = "zh-TW"
-
 [server]
 # 伺服器 IP 或網域名稱，可使用 * 來綁定所有 IP
 hostname="0.0.0.0"
 # 伺服器 PORT 設定 (預設值一般無須變更)
 port=8888
 
+#是否允許多開(同IP同時連線) true or false
+allow_multiple_pc = true
+
 #客戶端語言 0.US 3.Taiwan 4.Janpan 5.China
 client_language = 3
 
 [database]
+db_host = "127.0.0.1"
+db_port = 5432
+db_account = ""
+db_password = ""
+db_name = "l1jtw"
+# 連線池最高連線數 (設定越高越耗資源)
+db_pool_max_connections = 10

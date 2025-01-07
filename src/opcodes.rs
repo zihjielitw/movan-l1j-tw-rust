@@ -14,6 +14,8 @@ pub enum Opcodes {
     COpcodeLoginToServerOk,
     // 初始化演算法
     SOpcodeInitPacket,
+    // 登入結果
+    SOpcodeLoginResult,
     // 伺服器版本
     SOpcodeServerVersion,
 }
@@ -27,8 +29,9 @@ impl Opcodes {
             Opcodes::COpcodeKeepAlive => 95,
             Opcodes::COpcodeLoginToServer => 137,
             Opcodes::SOpcodeServerVersion => 139,
-            Opcodes::COpcodeBeanfunLoginPacket => 210,
             Opcodes::SOpcodeInitPacket => 150,
+            Opcodes::COpcodeBeanfunLoginPacket => 210,
+            Opcodes::SOpcodeLoginResult => 233,
         }
     }
 }

@@ -1,6 +1,4 @@
 use bytes::{BufMut, BytesMut};
-use encoding::all::BIG5_2003;
-use encoding::{DecoderTrap, Encoding};
 use crate::config::ServerConfig;
 
 pub struct ServerBasePacket {
@@ -10,7 +8,7 @@ pub struct ServerBasePacket {
 
 impl ServerBasePacket {
     pub fn new() -> ServerBasePacket {
-        let mut buffer = BytesMut::new();
+        let buffer = BytesMut::new();
 
         let global_server_config = ServerConfig::get_config().unwrap();
         let client_language =  global_server_config.server.client_language;
@@ -22,19 +20,19 @@ impl ServerBasePacket {
     }
 
     pub fn write_d(&mut self, value: i32) {
-        self.buffer.put_u8(value as u8 & 0xff );
-        self.buffer.put_u8((value >> 8) as u8 & 0xff );
-        self.buffer.put_u8((value >> 16) as u8 & 0xff );
-        self.buffer.put_u8((value >> 24) as u8 & 0xff );
+        self.buffer.put_u8((value & 0xff) as u8);
+        self.buffer.put_u8((value >> 8 & 0xff) as u8);
+        self.buffer.put_u8((value >> 16 & 0xff) as u8);
+        self.buffer.put_u8((value >> 24 & 0xff) as u8);
     }
 
     pub fn write_h(&mut self, value: i32) {
-        self.buffer.put_u8(value as u8 & 0xff );
-        self.buffer.put_u8((value >> 8) as u8 & 0xff );
+        self.buffer.put_u8((value & 0xff) as u8);
+        self.buffer.put_u8((value >> 8 & 0xff) as u8);
     }
 
     pub fn write_c(&mut self, value: i32) {
-        self.buffer.put_u8(value as u8 & 0xff );
+        self.buffer.put_u8((value & 0xff) as u8);
     }
 
     pub fn write_p(&mut self, value: i32) {
@@ -70,8 +68,8 @@ impl ServerBasePacket {
 
             match self.client_language {
                 3 => {
-                    let cover_string = self.encode_big5(text.into_bytes());
-                    self.buffer.put(cover_string.as_bytes());
+                   /* let cover_string = self.encode_big5(text.into_bytes());
+                    self.buffer.put(cover_string.as_bytes());*/
                 }
                 _ => ()
             }
@@ -87,17 +85,15 @@ impl ServerBasePacket {
     pub fn get_packets(&mut self) -> Vec<u8> {
        let padding = self.buffer.len() % 4;
         if padding != 0 {
-            for i in padding..4 {
+            for _ in padding..4 {
                 self.write_c(0)
             }
         }
 
+
+
         let final_packet = self.buffer.to_vec();
         self.buffer.clear();
         final_packet
-    }
-
-    fn encode_big5(&mut self, s: Vec<u8> ) -> String {
-        BIG5_2003.decode(&s,DecoderTrap::Strict).unwrap()
     }
 }

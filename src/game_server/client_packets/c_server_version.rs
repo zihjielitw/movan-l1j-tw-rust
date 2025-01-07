@@ -1,18 +1,14 @@
-use crate::game_server::client_base_packet::ClientBasePacket;
 use crate::game_server::server_packets::s_server_version::SServerVersion;
 
 pub struct CServerVersion {
-    client_base_packet: ClientBasePacket,
     current_client_version: i32,
     tag: String,
 }
 
 impl CServerVersion {
-    pub fn new(decrypt: Vec<u8>) -> CServerVersion {
-        let base_packet = ClientBasePacket::new(decrypt);
+    pub fn new() -> CServerVersion {
 
         CServerVersion {
-            client_base_packet: base_packet,
             current_client_version: 0x00000000,
             tag: String::from("[C] CServerVersion"),
         }
